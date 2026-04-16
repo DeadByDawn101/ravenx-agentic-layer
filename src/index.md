@@ -1,6 +1,10 @@
-# Runtime placeholder
+# Runtime notes
 
-This folder is reserved for the first executable implementation of the RavenX Agentic Layer.
+The first executable implementation now lives in `src/ravenx_agentic_layer/`.
 
-Suggested first artifact:
-- `layer.ts` or `layer.py` with a tiny task-routing contract
+Current modules:
+- `contracts.py` for typed request and result objects
+- `router.py` for route policy
+- `skills.py` for structured skill-card matching
+- `verification.py` for verification planning
+- `runtime.py` for the event-emitting orchestration surface

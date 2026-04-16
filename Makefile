@@ -1,8 +1,8 @@
 setup:
-	@echo "No setup required yet"
+	python -m pip install -U pytest
 
 check:
-	@echo "Docs scaffold is in place"
+	python -m pytest
 
 show-tree:
-	@find . -maxdepth 2 -type f | sort
+	@find . -maxdepth 3 -type f | sort
