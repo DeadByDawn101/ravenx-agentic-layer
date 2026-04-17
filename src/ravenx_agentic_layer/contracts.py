@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .profiles import ExecutionProfile
 
 
 class RouteKind(StrEnum):
@@ -44,3 +48,4 @@ class RuntimeResult:
     skill: str | None
     events: list[RuntimeEvent]
     verification: VerificationPlan
+    execution: ExecutionProfile

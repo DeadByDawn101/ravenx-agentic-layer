@@ -77,7 +77,7 @@ Example profile families:
 - `cloud_general`
 - `cloud_fallback`
 
-v0 only needs metadata, not live adapters.
+v0 needs metadata plus a thin behavior adapter that can expose the chosen profile and execution rhythm to an external runtime.
 
 ## Verification plan
 A verification plan is a list of checks plus risk notes.

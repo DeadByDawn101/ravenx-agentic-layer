@@ -32,7 +32,12 @@ It returns:
 - a deterministic event trace
 - a verification plan
 
+## Runtime additions
+- route decisions now resolve to explicit execution profiles
+- each profile carries an execution rhythm with named checkpoints
+- `OpenClawAdapter` converts runtime results into a behavior payload that can drive OpenClaw-facing instruction injection
+
 ## Next steps
-- add execution and model profiles
 - move routing heuristics into fixture-backed policy tests
 - add a CLI or service wrapper once the core behavior is stable
+- extend the adapter payload into a concrete bootstrap entrypoint

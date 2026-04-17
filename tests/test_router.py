@@ -12,4 +12,5 @@ def test_one_shot_route_for_pure_synthesis() -> None:
 
     assert result.route.kind is RouteKind.ONE_SHOT
     assert result.skill == "intake-synthesis"
+    assert result.execution.name == "synthesis-pass"
     assert result.verification.risk_notes == ["no verification command supplied"]
