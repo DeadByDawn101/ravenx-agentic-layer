@@ -21,4 +21,17 @@ class OpenClawAdapter:
                 "artifacts": result.verification.artifacts,
                 "risk_notes": result.verification.risk_notes,
             },
+            "handoff": (
+                {
+                    "skill": result.handoff.skill,
+                    "continuation_mode": result.handoff.continuation_mode,
+                    "summary": result.handoff.summary,
+                    "next_actions": result.handoff.next_actions,
+                    "checkpoints": result.handoff.checkpoints,
+                    "verification": result.handoff.verification,
+                    "watchouts": result.handoff.watchouts,
+                }
+                if result.handoff
+                else None
+            ),
         }

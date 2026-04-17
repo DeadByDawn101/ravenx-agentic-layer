@@ -36,6 +36,16 @@ It returns:
 - route decisions now resolve to explicit execution profiles
 - each profile carries an execution rhythm with named checkpoints
 - `OpenClawAdapter` converts runtime results into a behavior payload that can drive OpenClaw-facing instruction injection
+- coding tasks now emit a built-in `handoff` artifact for cross-session and cross-agent continuation
+
+## Built-in coding handoff artifact
+When the runtime matches the `repo-coding-loop` skill, it now produces a typed handoff payload with:
+- a continuation summary tied to the active execution profile
+- ordered next actions for the next session or delegate agent
+- carried-forward verification commands
+- watchouts derived from task constraints and scope size
+
+This makes coding-task continuation inspectable instead of burying session handoff instructions in prompt text.
 
 ## Next steps
 - move routing heuristics into fixture-backed policy tests

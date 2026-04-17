@@ -43,9 +43,21 @@ class VerificationPlan:
 
 
 @dataclass(slots=True)
+class HandoffArtifact:
+    skill: str
+    continuation_mode: str
+    summary: str
+    next_actions: list[str] = field(default_factory=list)
+    checkpoints: list[str] = field(default_factory=list)
+    verification: list[str] = field(default_factory=list)
+    watchouts: list[str] = field(default_factory=list)
+
+
+@dataclass(slots=True)
 class RuntimeResult:
     route: RouteDecision
     skill: str | None
     events: list[RuntimeEvent]
     verification: VerificationPlan
     execution: ExecutionProfile
+    handoff: HandoffArtifact | None = None

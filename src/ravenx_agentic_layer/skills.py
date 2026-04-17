@@ -17,7 +17,7 @@ class SkillCard:
 DEFAULT_SKILLS: tuple[SkillCard, ...] = (
     SkillCard(
         name="repo-coding-loop",
-        triggers=("build", "fix", "refactor", "implement", "test"),
+        triggers=("build", "fix", "refactor", "implement", "test", "handoff", "continue", "resume"),
         preferred_route=RouteKind.DELEGATED_LOOP,
         required_tools=("read", "edit", "exec"),
         verification_style="narrow-first",
