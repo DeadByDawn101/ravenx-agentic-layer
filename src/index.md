@@ -8,3 +8,4 @@ Current modules:
 - `skills.py` for structured skill-card matching
 - `verification.py` for verification planning
 - `runtime.py` for the event-emitting orchestration surface
+- `autoresearch.py` for behavior eval cases, candidate mutations, and next-loop planning

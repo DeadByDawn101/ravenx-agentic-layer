@@ -4,19 +4,27 @@ from .contracts import RuntimeEvent, RuntimeResult, TaskRequest
 from .handoff import HandoffBuilder
 from .profiles import ProfileRegistry
 from .router import PolicyRouter
-from .skills import match_skill
+from .skills import DEFAULT_SKILLS, SkillCard, match_skill
 from .verification import VerificationPlanner
 
 
 class AgenticLayerRuntime:
-    def __init__(self) -> None:
-        self.router = PolicyRouter()
-        self.verification = VerificationPlanner()
-        self.profiles = ProfileRegistry()
-        self.handoff = HandoffBuilder()
+    def __init__(
+        self,
+        router: PolicyRouter | None = None,
+        verification: VerificationPlanner | None = None,
+        profiles: ProfileRegistry | None = None,
+        handoff: HandoffBuilder | None = None,
+        skills: tuple[SkillCard, ...] = DEFAULT_SKILLS,
+    ) -> None:
+        self.router = router or PolicyRouter()
+        self.verification = verification or VerificationPlanner()
+        self.profiles = profiles or ProfileRegistry()
+        self.handoff = handoff or HandoffBuilder()
+        self.skills = skills
 
     def run(self, request: TaskRequest) -> RuntimeResult:
-        skill = match_skill(request)
+        skill = match_skill(request, skills=self.skills)
         route = self.router.decide(request)
         verification = self.verification.build(request)
         execution = self.profiles.match(route.kind)

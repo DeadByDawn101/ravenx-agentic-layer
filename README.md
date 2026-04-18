@@ -10,8 +10,9 @@ A minimal runtime scaffold for a practical agent orchestration layer in the Rave
 ## Current layout
 - `docs/comparative-intake.md` captures the best reusable ideas from the reviewed repos
 - `docs/implementation-spec-v0.md` defines the first runtime contract and milestones
-- `src/ravenx_agentic_layer/` contains the first Python scaffold for routing and event emission
-- `tests/` covers basic route and runtime behavior
+- `docs/behavior-autoresearch-loop.md` defines the first behavior mutation and evaluation loop
+- `src/ravenx_agentic_layer/` contains the Python scaffold for routing, handoff generation, and behavior evals
+- `tests/` covers route behavior, runtime behavior, and baseline autoresearch evals
 
 ## Quick start
 ```bash
@@ -37,6 +38,7 @@ It returns:
 - each profile carries an execution rhythm with named checkpoints
 - `OpenClawAdapter` converts runtime results into a behavior payload that can drive OpenClaw-facing instruction injection
 - coding tasks now emit a built-in `handoff` artifact for cross-session and cross-agent continuation
+- a minimal behavior autoresearch harness can score candidate mutations against route, skill, handoff, and checkpoint expectations
 
 ## Built-in coding handoff artifact
 When the runtime matches the `repo-coding-loop` skill, it now produces a typed handoff payload with:
@@ -47,7 +49,14 @@ When the runtime matches the `repo-coding-loop` skill, it now produces a typed h
 
 This makes coding-task continuation inspectable instead of burying session handoff instructions in prompt text.
 
+## Behavior autoresearch scaffold
+- `BehaviorEvalHarness` runs inspectable task fixtures against the current runtime
+- `CandidateMutation` lets the repo trial small behavior changes like new route terms or skill triggers
+- `BehaviorLoopPlan` turns misses into the next concrete mutation ideas instead of vague tuning notes
+- `DEFAULT_BEHAVIOR_EVALS` gives the repo a baseline suite for bounded edits, synthesis, and delegated multi-file work
+
 ## Next steps
-- move routing heuristics into fixture-backed policy tests
+- move behavior eval cases into fixture files for larger coverage
+- add verification-plan and handoff-content scoring
 - add a CLI or service wrapper once the core behavior is stable
 - extend the adapter payload into a concrete bootstrap entrypoint
