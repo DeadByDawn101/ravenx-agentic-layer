@@ -55,8 +55,22 @@ This makes coding-task continuation inspectable instead of burying session hando
 - `BehaviorLoopPlan` turns misses into the next concrete mutation ideas instead of vague tuning notes
 - `DEFAULT_BEHAVIOR_EVALS` gives the repo a baseline suite for bounded edits, synthesis, and delegated multi-file work
 
+## Loop runner CLI
+Run the bounded behavior loop once and emit reports:
+
+```bash
+python -m ravenx_agentic_layer.cli run-loop --print-markdown
+python -m ravenx_agentic_layer.cli run-loop --json-out reports/behavior-loop/latest.json --markdown-out reports/behavior-loop/latest.md
+python -m ravenx_agentic_layer.cli suggest-mutations
+```
+
+What it does now:
+- evaluates the baseline behavior suite in one bounded pass
+- generates a next-loop plan from misses or coverage gaps
+- emits JSON and markdown reports that are easy to schedule daily
+- proposes concrete candidate mutations instead of leaving only free-form notes
+
 ## Next steps
 - move behavior eval cases into fixture files for larger coverage
 - add verification-plan and handoff-content scoring
-- add a CLI or service wrapper once the core behavior is stable
 - extend the adapter payload into a concrete bootstrap entrypoint

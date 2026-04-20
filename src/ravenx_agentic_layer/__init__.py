@@ -9,6 +9,7 @@ from .autoresearch import (
 )
 from .contracts import HandoffArtifact, RouteDecision, RouteKind, RuntimeEvent, TaskRequest
 from .handoff import HandoffBuilder
+from .looprunner import BehaviorLoopRunner, LoopRunRecord, MutationSuggestion
 from .openclaw import OpenClawAdapter
 from .profiles import ExecutionProfile, ExecutionRhythm
 from .runtime import AgenticLayerRuntime
@@ -27,6 +28,9 @@ __all__ = [
     "ExecutionRhythm",
     "HandoffArtifact",
     "HandoffBuilder",
+    "BehaviorLoopRunner",
+    "LoopRunRecord",
+    "MutationSuggestion",
     "OpenClawAdapter",
     "RouteDecision",
     "RouteKind",
