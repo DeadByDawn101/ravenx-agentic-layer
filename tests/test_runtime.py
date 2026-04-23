@@ -37,6 +37,24 @@ def test_direct_edit_route_for_bounded_change() -> None:
     ]
 
 
+def test_mixed_compare_and_implement_request_stays_direct_when_scope_is_small() -> None:
+    runtime = AgenticLayerRuntime()
+    request = TaskRequest(
+        task="compare the current retry flow, then implement a safe fix",
+        scope=["src/sender.ts", "tests/sender.test.ts"],
+        constraints=["preserve API", "keep diff small"],
+        verification=["bun test tests/sender.test.ts"],
+        deliverable="patched code and a concise explanation",
+    )
+
+    result = runtime.run(request)
+
+    assert result.route.kind is RouteKind.DIRECT_EDIT
+    assert result.route.reasons == ["scope is bounded and verification is narrow"]
+    assert result.handoff is not None
+    assert result.handoff.continuation_mode == "single_pass"
+
+
 def test_delegated_route_for_broader_change() -> None:
     runtime = AgenticLayerRuntime()
     request = TaskRequest(

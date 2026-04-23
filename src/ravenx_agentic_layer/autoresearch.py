@@ -28,6 +28,8 @@ class BehaviorEvalCase:
     expected_skill: str | None = None
     expect_handoff: bool = False
     expected_checkpoints: tuple[str, ...] = field(default_factory=tuple)
+    expected_risk_notes: tuple[str, ...] = field(default_factory=tuple)
+    expected_route_reasons: tuple[str, ...] = field(default_factory=tuple)
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,7 +73,7 @@ class BehaviorEvalHarness:
         runtime = self._build_runtime(mutation)
         outcomes = tuple(self._run_case(runtime, case) for case in cases)
         total_score = sum(outcome.score for outcome in outcomes)
-        max_score = float(len(outcomes) * 4)
+        max_score = float(len(outcomes) * 6)
         passed = sum(1 for outcome in outcomes if outcome.passed)
         summary = f"{candidate_name} passed {passed}/{len(outcomes)} cases"
         return BehaviorEvalReport(
@@ -101,6 +103,10 @@ class BehaviorEvalHarness:
                 next_mutations.append("tighten the coding handoff expectation for delegated work")
             if any("checkpoint" in failure for failure in outcome.failures):
                 next_mutations.append("align execution checkpoints with the expected rhythm")
+            if any("risk notes" in failure for failure in outcome.failures):
+                next_mutations.append("tighten verification heuristics for under-specified or high-burden tasks")
+            if any("route reasons" in failure for failure in outcome.failures):
+                next_mutations.append("make route rationale explicit for ambiguous boundary cases")
 
         if not next_mutations:
             next_mutations.append("raise case difficulty with broader multi-tool or handoff-heavy tasks")
@@ -153,6 +159,18 @@ class BehaviorEvalHarness:
         else:
             failures.append(f"checkpoint mismatch: expected {case.expected_checkpoints} but saw {checkpoints}")
 
+        risk_notes = tuple(result.verification.risk_notes)
+        if not case.expected_risk_notes or risk_notes == case.expected_risk_notes:
+            score += 1
+        else:
+            failures.append(f"risk notes mismatch: expected {case.expected_risk_notes} but saw {risk_notes}")
+
+        route_reasons = tuple(result.route.reasons)
+        if not case.expected_route_reasons or route_reasons == case.expected_route_reasons:
+            score += 1
+        else:
+            failures.append(f"route reasons mismatch: expected {case.expected_route_reasons} but saw {route_reasons}")
+
         return BehaviorEvalOutcome(
             case_name=case.name,
             passed=not failures,
@@ -175,6 +193,22 @@ DEFAULT_BEHAVIOR_EVALS: tuple[BehaviorEvalCase, ...] = (
         expected_skill="repo-coding-loop",
         expect_handoff=True,
         expected_checkpoints=("inspect-target-files", "apply-change", "run-requested-checks"),
+        expected_route_reasons=("scope is bounded and verification is narrow",),
+    ),
+    BehaviorEvalCase(
+        name="mixed compare-and-implement request stays direct for bounded work",
+        request=TaskRequest(
+            task="compare the current retry flow, then implement a safe fix",
+            scope=["src/sender.ts", "tests/sender.test.ts"],
+            constraints=["preserve API", "keep diff small"],
+            verification=["bun test tests/sender.test.ts"],
+            deliverable="patched code and a concise explanation",
+        ),
+        expected_route=RouteKind.DIRECT_EDIT,
+        expected_skill="repo-coding-loop",
+        expect_handoff=True,
+        expected_checkpoints=("inspect-target-files", "apply-change", "run-requested-checks"),
+        expected_route_reasons=("scope is bounded and verification is narrow",),
     ),
     BehaviorEvalCase(
         name="synthesis request stays one-shot",
@@ -186,6 +220,8 @@ DEFAULT_BEHAVIOR_EVALS: tuple[BehaviorEvalCase, ...] = (
         expected_skill="intake-synthesis",
         expect_handoff=False,
         expected_checkpoints=("gather-context", "compose-answer"),
+        expected_risk_notes=("no verification command supplied",),
+        expected_route_reasons=("task is synthesis-oriented and does not require explicit file mutation",),
     ),
     BehaviorEvalCase(
         name="broad cross-module task delegates with handoff",
@@ -200,5 +236,22 @@ DEFAULT_BEHAVIOR_EVALS: tuple[BehaviorEvalCase, ...] = (
         expected_skill="repo-coding-loop",
         expect_handoff=True,
         expected_checkpoints=("map-scope", "apply-batch", "verify-milestone", "summarize-delta"),
+        expected_risk_notes=("broad scope may need integration verification",),
+        expected_route_reasons=("scope spans multiple files or modules",),
+    ),
+    BehaviorEvalCase(
+        name="handoff-heavy multi-tool request delegates on verification burden",
+        request=TaskRequest(
+            task="resume the flaky checkout recovery work across runtime, adapter, docs, and tests",
+            scope=["runtime.py", "openclaw.py", "docs/behavior.md"],
+            constraints=["preserve event ordering", "leave a handoff for Iris"],
+            verification=["pytest tests/test_runtime.py", "pytest tests/test_autoresearch.py", "python -m compileall src"],
+            deliverable="updated runtime, docs, and a clean handoff note",
+        ),
+        expected_route=RouteKind.DELEGATED_LOOP,
+        expected_skill="repo-coding-loop",
+        expect_handoff=True,
+        expected_checkpoints=("map-scope", "apply-batch", "verify-milestone", "summarize-delta"),
+        expected_route_reasons=("verification burden is non-trivial",),
     ),
 )

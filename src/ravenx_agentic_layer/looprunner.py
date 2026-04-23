@@ -32,6 +32,7 @@ class LoopRunRecord:
     suggestions: tuple[MutationSuggestion, ...] = field(default_factory=tuple)
 
     def to_dict(self) -> dict[str, object]:
+        failures = [outcome.case_name for outcome in self.report.outcomes if not outcome.passed]
         return {
             "created_at": self.created_at,
             "report": {
@@ -39,6 +40,8 @@ class LoopRunRecord:
                 "summary": self.report.summary,
                 "total_score": self.report.total_score,
                 "max_score": self.report.max_score,
+                "pass_rate": len(self.report.outcomes) and self.report.total_score / self.report.max_score,
+                "failed_cases": failures,
                 "outcomes": [asdict(outcome) for outcome in self.report.outcomes],
             },
             "plan": asdict(self.plan),
@@ -148,6 +151,28 @@ class BehaviorLoopRunner:
                         ),
                     )
                 )
+            elif "verification heuristics" in idea:
+                suggestions.append(
+                    MutationSuggestion(
+                        name="verification-risk-hardening",
+                        rationale=idea,
+                        mutation=CandidateMutation(
+                            name="verification-risk-hardening",
+                            notes=("Add evals for missing or high-burden verification so risk notes stay actionable.",),
+                        ),
+                    )
+                )
+            elif "route rationale" in idea:
+                suggestions.append(
+                    MutationSuggestion(
+                        name="route-rationale-boundaries",
+                        rationale=idea,
+                        mutation=CandidateMutation(
+                            name="route-rationale-boundaries",
+                            notes=("Add ambiguous boundary cases that assert why the runtime chose direct edit vs delegated loop.",),
+                        ),
+                    )
+                )
             else:
                 slug = idea.replace(" ", "-")[:48]
                 suggestions.append(
@@ -173,19 +198,24 @@ class BehaviorLoopRunner:
         return target
 
     def render_markdown(self, record: LoopRunRecord) -> str:
+        pass_rate = record.report.total_score / record.report.max_score if record.report.max_score else 0.0
+        failed_cases = [outcome.case_name for outcome in record.report.outcomes if not outcome.passed]
         lines = [
             "# Behavior loop run",
             "",
             f"- Created at: {record.created_at}",
             f"- Candidate: {record.report.candidate}",
             f"- Score: {record.report.total_score}/{record.report.max_score}",
+            f"- Pass rate: {pass_rate:.2%}",
             f"- Summary: {record.report.summary}",
+            f"- Failed cases: {', '.join(failed_cases) or 'none'}",
             "",
             "## Case outcomes",
         ]
+        per_case_max = int(record.report.max_score / len(record.report.outcomes)) if record.report.outcomes else 0
         for outcome in record.report.outcomes:
             status = "pass" if outcome.passed else "fail"
-            lines.append(f"- {outcome.case_name}: {status} ({outcome.score}/4)")
+            lines.append(f"- {outcome.case_name}: {status} ({outcome.score}/{per_case_max})")
             for failure in outcome.failures:
                 lines.append(f"  - {failure}")
 

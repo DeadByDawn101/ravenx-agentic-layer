@@ -10,7 +10,7 @@ def test_behavior_loop_runner_generates_report_and_default_suggestion() -> None:
 
     record = runner.run_once()
 
-    assert record.report.summary == "baseline passed 3/3 cases"
+    assert record.report.summary == "baseline passed 5/5 cases"
     assert record.plan.next_mutations == ("raise case difficulty with broader multi-tool or handoff-heavy tasks",)
     assert record.suggestions[0].name.startswith("raise-case-difficulty")
 
@@ -25,9 +25,12 @@ def test_behavior_loop_runner_writes_json_and_markdown_reports(tmp_path: Path) -
     payload = json.loads(json_path.read_text())
     markdown = markdown_path.read_text()
 
-    assert payload["report"]["summary"] == "baseline passed 3/3 cases"
+    assert payload["report"]["summary"] == "baseline passed 5/5 cases"
+    assert payload["report"]["pass_rate"] == 1.0
+    assert payload["report"]["failed_cases"] == []
     assert payload["suggestions"][0]["name"].startswith("raise-case-difficulty")
     assert "# Behavior loop run" in markdown
+    assert "- Pass rate: 100.00%" in markdown
     assert "## Suggested candidate mutations" in markdown
 
 
@@ -39,7 +42,7 @@ def test_cli_run_loop_writes_requested_outputs(tmp_path: Path, capsys) -> None:
     stdout = capsys.readouterr().out
 
     assert exit_code == 0
-    assert json.loads(stdout)["report"]["summary"] == "baseline passed 3/3 cases"
+    assert json.loads(stdout)["report"]["summary"] == "baseline passed 5/5 cases"
     assert json_path.exists()
     assert markdown_path.exists()
 
